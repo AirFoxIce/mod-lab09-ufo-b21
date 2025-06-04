@@ -1,24 +1,15 @@
-﻿# Visual Studio
+﻿# Бинарные и временные папки
+bin/
+obj/
 .vs/
+
+# Пользовательские файлы среды
 *.user
 *.suo
 
-# Build results
-bin/
-obj/
-
-# Logs
+# Временные файлы
+*.cache
 *.log
 
-# Temporary files
-*.tmp
-*.temp
-*.bak
-*.swp
-
-# Rider / JetBrains
-.idea/
-
-# Windows system
-Thumbs.db
-Desktop.ini
+# Исключить всё, кроме разрешённых расширений
+# (этот блок можно опустить, если вручную добавляешь файлы через `git add`)
