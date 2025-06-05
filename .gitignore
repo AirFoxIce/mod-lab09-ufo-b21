@@ -1,15 +1,33 @@
-﻿# Бинарные и временные папки
-bin/
+﻿bin/
 obj/
 .vs/
+packages/
 
-# Пользовательские файлы среды
+
 *.user
 *.suo
-
-# Временные файлы
 *.cache
 *.log
+*.tmp
+*.bak
 
-# Исключить всё, кроме разрешённых расширений
-# (этот блок можно опустить, если вручную добавляешь файлы через `git add`)
+
+*.dll
+*.exe
+*.pdb
+
+
+result/*
+!result/plot.png
+!result/data.txt
+
+
+*.nupkg
+.nuget/
+
+
+*.aps
+*.dbmdl
+*.ipch
+*.VC.db
+*.VC.VC.opendb

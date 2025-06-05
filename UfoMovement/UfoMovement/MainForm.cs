@@ -19,11 +19,11 @@ namespace UfoMovement
         Bitmap bmp;
         Graphics g;
         Timer timer = new Timer();
-        double x1 = 23, y1 = 63;
-        double x2 = 498, y2 = 359;
-        double epsilon = 10;
-        double step = 15;
-        int numMembers = 3;
+        double x1 = 100, y1 = 100;
+        double x2 = 900, y2 = 700;
+        double epsilon = 2;
+        double step = 1;
+        int numMembers = 50;
 
         public MainForm()
         {
@@ -68,55 +68,75 @@ namespace UfoMovement
             timer.Start();
         }
 
+        // двоичный поиск с разумной точностью,
+        // так как простым перебором слишком большая нагрузка
+        // из-за большого количества итераций
+        // следовательно тяжело ответить на вопрос при каком эпсилон мы теряем попадание
+        // график будет показывать, что при уменьшение на чуть-чуть эпсилона
+        // мы будем выпадать из окружности
         private void buttonTest_Click(object sender, EventArgs e)
         {
-            List<string> lines = new List<string>();
-            lines.Add("Members \tEpsilon \tError");
+            var lines = new List<string>();
+            lines.Add("Epsilon\tFailAtN");
+            var points = new List<(double epsilon, int members)>();
 
             double startX = x1;
             double startY = y1;
             double targetX = x2;
             double targetY = y2;
-            double step = 15;
+            double step = 1;
 
-            for (int members = 1; members <= 20; members++)
+            for (int n = 1; n <= 5; n++)
             {
-                double lastBadEps = 0;
-                double lastBadErr = 0;
+                double l = 0;
+                double r = 100;
+                double found = -1;
 
-                for (int eps = 2; eps <= 40; eps += 2)
+                for (int i = 0; i < 25; i++)
                 {
-                    double epsilon = eps;
+                    double mid = (l + r) / 2.0;
+                    var path = MoveLogic.FuncAngle(startX, startY, targetX, targetY, step, mid, n);
 
-                    var list = MoveLogic.FuncAngle(startX, startY, targetX, targetY, step, epsilon, members);
-
-                    if (list.Count == 0)
+                    if (path.Count == 0)
+                    {
+                        l = mid;
                         continue;
+                    }
 
-                    var last = list[list.Count - 1];
+                    var last = path.Last();
                     double dx = last.X - targetX;
                     double dy = last.Y - targetY;
                     double dist = Math.Sqrt(dx * dx + dy * dy);
 
-                    if (dist > epsilon)
+                    if (dist <= mid)
                     {
-                        lastBadEps = epsilon;
-                        lastBadErr = dist;
+                        found = mid;
+                        r = mid;
                     }
                     else
                     {
-                        if (lastBadEps > 0)
-                            lines.Add(members + "\t\t\t" + lastBadEps + "\t\t\t" + lastBadErr.ToString("0.00"));
-                        break;
+                        l = mid;
                     }
+                }
+
+                if (found != -1)
+                {
+                    lines.Add($"{found:F6}\t{n}");
+                    points.Add((found, n));
                 }
             }
 
-            Directory.CreateDirectory("../../../result");
-            File.WriteAllLines("../../../result/data.txt", lines);
+            string root = Path.GetFullPath(Path.Combine(Application.StartupPath, "..\\..\\..\\.."));
+            string resultDir = Path.Combine(root, "result");
+            Directory.CreateDirectory(resultDir);
+            File.WriteAllLines(Path.Combine(resultDir, "data.txt"), lines);
 
-            MessageBox.Show("Файл result/data.txt обновлён. Готово!");
+            PlotDrawer.DrawPlot(points.OrderBy(p => p.epsilon).ToList(), 1, 5, 0, 100, Path.Combine(resultDir, "plot.png"));
+
+            MessageBox.Show("Готово!");
         }
+
+
 
 
 

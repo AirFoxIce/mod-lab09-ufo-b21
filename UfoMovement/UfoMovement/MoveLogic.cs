@@ -83,7 +83,7 @@ namespace UfoMovement
             double stepY = step * MyMath.MySin(angle, numMembers);
 
             int steps = 0;
-            int maxSteps = 500;
+            int maxSteps = 100000;
 
             double prevDist = double.MaxValue;
 
@@ -101,7 +101,6 @@ namespace UfoMovement
 
                 if (dist > prevDist)
                 {
-                    // точка начала отдаляться — выходим
                     break;
                 }
 
